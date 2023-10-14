@@ -29,8 +29,8 @@ function App() {
   const [darkMode, setDarkMode] = useState<boolean>(true)
 
   const [soundMute, setSoundMute] = useState<boolean>(false)
-  const [eatSound] = useSound('/eat.mp3', { volume: 3.5 })
-  const [loseSound] = useSound('/lost.mp3', { volume: 0.25 })
+  const [eatSound] = useSound('./eat.mp3', { volume: 3.5 })
+  const [loseSound] = useSound('./lost.mp3', { volume: 0.25 })
 
   function runGame() {
     if (document.documentElement.classList.contains('dark') && darkMode == false) {
