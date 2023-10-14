@@ -28,7 +28,7 @@ function App() {
 
   const [darkMode, setDarkMode] = useState<boolean>(true)
 
-  const [soundMute, setSoundMute] = useState<boolean>(false)
+  const [soundMute, setSoundMute] = useState<boolean>(localStorage.getItem('soundMute') ? Boolean(localStorage.getItem('soundMute')) : false)
   const [eatSound] = useSound('./eat.mp3', { volume: 3.5 })
   const [loseSound] = useSound('./lost.mp3', { volume: 0.25 })
 
@@ -179,7 +179,15 @@ function App() {
               <Github className='h-[1.2rem] w-[1.2rem] scale-100 transition-all' />
             </Button>
             <ModeToggle />
-            <Button variant="outline" size="icon" onClick={() => soundMute? setSoundMute(false) : setSoundMute(true)}>
+            <Button variant="outline" size="icon" onClick={() => {
+              if (soundMute == true) {
+                setSoundMute(false)
+                localStorage.setItem('soundMute', 'false')
+              } else {
+                setSoundMute(true)
+                localStorage.setItem('soundMute', 'true')
+              }
+            }}>
               <Volume2 className={`h-[1.2rem] w-[1.2rem] transition-all ${soundMute? '-rotate-90 scale-0' : 'rotate-0 scale-100'}`}/>
               <VolumeX className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${soundMute? 'rotate-0 scale-100' : 'rotate-90 scale-0'}`} />
             </Button>
