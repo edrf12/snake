@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useInterval } from 'usehooks-ts'
+import useSound from 'use-sound'
 
 import { ModeToggle } from './components/mode-toggle'
 import { Button } from './components/ui/button'
 
-import { Github } from 'lucide-react'
+import { Github, Volume2, VolumeX } from 'lucide-react'
 
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 
@@ -15,7 +16,6 @@ const INITIAL_FOOD = [ (Math.floor(Math.random() * 23) + 1 ) * 20, (Math.floor(M
 
 function App() {
   const canvas = useRef<HTMLCanvasElement>(null)
-  const gameOverText = useRef<HTMLParagraphElement>(null)
 
   const [snake, setSnake] = useState(INITIAL_SNAKE)
   const [food, setFood] = useState<number[]>(INITIAL_FOOD) // [ x, y ]
@@ -27,6 +27,10 @@ function App() {
   const [gameOver, setGameOver] = useState<boolean>(false)
 
   const [darkMode, setDarkMode] = useState<boolean>(true)
+
+  const [soundMute, setSoundMute] = useState<boolean>(false)
+  const [eatSound] = useSound('/eat.mp3', { volume: 3.5 })
+  const [loseSound] = useSound('/lost.mp3', { volume: 0.25 })
 
   function runGame() {
     if (document.documentElement.classList.contains('dark') && darkMode == false) {
@@ -46,6 +50,9 @@ function App() {
     newSnake.unshift(newHead)
 
     if (newHead[0] == food[0] && newHead[1] == food[1]) {
+      if (soundMute == false) {
+          eatSound()
+      }
       const newScore = score + 1
       setFood([ (Math.floor(Math.random() * 23) + 1 ) * 20, (Math.floor(Math.random() * 23) + 1 ) * 20 ])
 
@@ -61,7 +68,9 @@ function App() {
 
     if (newHead[0] < 0 || newHead[0] > CANVAS_WIDTH - 20 || newHead[1] < 0 || newHead[1] > CANVAS_HEIGHT - 20 ) {
       setGameOver(true)
-      gameOverText.current?.classList.remove('invisible')
+      if (soundMute == false) {
+          loseSound()
+        }
       localStorage.setItem('bestScore', bestScore.toString())
     }
 
@@ -69,7 +78,9 @@ function App() {
       if (index === 0) return
       if (newHead[0] === segment[0] && newHead[1] === segment[1]) {
         setGameOver(true)
-        gameOverText.current?.classList.remove('invisible')
+        if (soundMute == false) {
+          loseSound()
+        }
         localStorage.setItem('bestScore', bestScore.toString())
       }
     })
@@ -78,7 +89,6 @@ function App() {
   }
 
   function startGame() {
-    gameOverText.current?.classList.add('invisible')
     setGameOver(false)
     setMovement([ 0, 0 ])
     setScore(0)
@@ -160,22 +170,26 @@ function App() {
       </Helmet>
       <div className='dark:bg-zinc-950 bg-zinc-100 flexbox'>  
         <div className="border-b flex h-[8vh] w-screen items-center justify-center px-4">
-          <div className='h-10 w-[5.5rem]' />
+          <div className='h-10 w-[8rem]' />
           <p className='text-xl font-medium  font-mono mx-auto'>
             Snake Game
           </p>
-          <div>
-            <Button className='mr-2' variant='outline' size='icon' onClick={() => window.open('https://github.com/edrf12/snake')}>
+          <div className='flex gap-1'>
+            <Button variant='outline' size='icon' onClick={() => window.open('https://github.com/edrf12/snake')}>
               <Github className='h-[1.2rem] w-[1.2rem] scale-100 transition-all' />
             </Button>
             <ModeToggle />
+            <Button variant="outline" size="icon" onClick={() => soundMute? setSoundMute(false) : setSoundMute(true)}>
+              <Volume2 className={`h-[1.2rem] w-[1.2rem] transition-all ${soundMute? '-rotate-90 scale-0' : 'rotate-0 scale-100'}`}/>
+              <VolumeX className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${soundMute? 'rotate-0 scale-100' : 'rotate-90 scale-0'}`} />
+            </Button>
           </div>
         </div>
         
         <div className="flex flex-col h-[92vh] items-center justify-center px-4">
-          <div className=' relative mx-auto'>
+          <div className='relative mx-auto'>
             <canvas className='border rounded-lg p-1' ref={canvas} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
-            <p ref={gameOverText} className='invisible first-letter:z-10 relative -top-[32vh] text-center text-xl text-red-600 font-medium font-mono'>
+            <p className={`${gameOver? null : 'invisible'} first-letter:z-10 relative -top-[32vh] text-center text-xl text-red-600 font-medium font-mono`}>
               Game Over <br />
               Press ENTER to restart
             </p>
