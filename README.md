@@ -1,4 +1,5 @@
 # Snake Game
+### [Preview](https://edrf12.github.io/snake)
 Basic snake game with high score, score, dark mode and light mode.
 
 Built with:
