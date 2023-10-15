@@ -28,7 +28,7 @@ function App() {
 
   const [darkMode, setDarkMode] = useState<boolean>(true)
 
-  const [soundMute, setSoundMute] = useState<boolean>(localStorage.getItem('soundMute') ? Boolean(localStorage.getItem('soundMute')) : false)
+  const [soundMute, setSoundMute] = useState<boolean>(localStorage.getItem('soundMute') ? localStorage.getItem('soundMute') === "true" : false)
   const [eatSound] = useSound('./eat.mp3', { volume: 3.5 })
   const [loseSound] = useSound('./lost.mp3', { volume: 0.25 })
 
